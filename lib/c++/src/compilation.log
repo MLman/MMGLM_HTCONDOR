@@ -1,0 +1,1 @@
+g++ -Wall -Wextra -Wunreachable-code -static -O2 mmglm_spd.cpp -o ../bin/mmglm_spd -I ../lib/armadillo-7.100.3/include/ -DARMA_DONT_USE_WRAPPER -lblas -llapack 

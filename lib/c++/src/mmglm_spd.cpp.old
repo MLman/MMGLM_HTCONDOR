@@ -1,0 +1,120 @@
+//============================================================================
+// Name        : mmglm_dti.cpp
+// Author      : Hyunwoo J. Kim
+//	           : Anmol Mohanty
+// Version     : 0.2
+// Date        : 06.01.2016
+// Copyright   :
+// Description :
+//============================================================================
+
+
+#include <iostream>
+#include <armadillo>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+
+#include "spd_funcs.h"
+#include "mmglm_spd.h"
+
+#define DIM_DTI 6
+// Index of elements in save files
+#define iDxx 0
+#define iDxy 1
+#define iDxz 2
+#define iDyy 3
+#define iDyz 4
+#define iDzz 5
+
+using namespace std;
+
+using namespace arma; //for the armadillo library, this is separate from boost
+
+namespace fs=boost::filesystem; //namespace is being declared
+
+int main(int argc, char** argv)
+{
+
+    //creating 3 paths named below
+    fs::path input_dir;
+    fs::path shared_dir;
+
+    //interesting-figure out why this is being done?
+    if(argc >= 2){
+        input_dir = argv[1]; // Results will be written in input_dir too.
+        shared_dir = argv[2];
+    }else{
+        shared_dir = "./";
+    }
+
+    mat X; //declaring a matrix armadillo code || Armadillo API
+    mat Yv;
+
+    fs::path Xname = "Xs_arma.mat";
+
+    X.load((shared_dir/Xname).string(), raw_ascii);  //load into the variable X
+    fs::path cur_dir(fs::current_path());
+    fs::path Yname = "Ys_arma.mat";
+    Yv.load((input_dir/Yname).string(),raw_ascii); // load into vY
+
+    // Convert into cube
+    unsigned int nsubjects = Yv.n_cols;
+
+    //Could this be causing the issue?
+    cube Y(3,3,nsubjects);
+
+    imat idx_dti;
+    fs::path idx_name = "idx_perm_arma.mat";
+    idx_dti.load((shared_dir/idx_name).string(), raw_ascii);
+    float nperms = idx_dti.n_rows;
+
+    imat mask_job;
+    fs::path maskname = "mask_job_arma.mat";
+    mask_job.load((input_dir/maskname).string(),raw_ascii);
+    unsigned int nvoxels = mask_job.n_rows;
+
+    mat ErrMx1(nvoxels, nperms);
+    mat ErrMx2(nvoxels, nperms);
+
+    ErrMx1 = ErrMx1.zeros(); //initialize
+    ErrMx2 = ErrMx2.zeros();
+
+    // Extract one voxel and reshape
+    unsigned int ivoxel;
+    mat ErrMxfinal = ErrMx1-ErrMx2; //difference/improvement in the errors
+
+    size_t length=0;//initializing length as a counter
+    float *p_value=(float*)malloc(nvoxels*sizeof(float)); //creates a p_value vector of type float for all voxels
+    float count=0;
+
+    for(ivoxel = 0; ivoxel < nvoxels; ivoxel++){
+        count=0;
+    	length=nperms;
+        while(length--)
+            {
+                if(ErrMxfinal(ivoxel,length)>ErrMxfinal(ivoxel,0))
+	             count++; //find out values greater than ref value
+            }
+    	p_value[ivoxel]= count/nperms; //typecasting
+    }
+
+    if( remove( "p_value.txt" ) == 0 ) //file exists
+        perror( "File existed and has been cleaned up" );  //recheck if this actually removes the file?
+    else puts("Writing p_values to file");
+
+    ofstream fout("p_value.txt"); //opening an output stream for file p_value.txt
+  if(fout.is_open())
+  {
+	for(unsigned int i=0;i<nvoxels;i++)
+        {
+            fout << p_value[i]; //writing ith character of p_value in the file
+            fout <<",\n";
+        }
+    }
+    else //file could not be opened
+    {
+        cout << "File could not be opened." << endl;
+    }
+    return 0;
+}
