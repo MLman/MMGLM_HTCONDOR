@@ -1,4 +1,4 @@
-Manifold-valued Multivariate General Linear Models (MMGLMs) with Matlab scripts for generating small jobs for HTConder/AWS
+Manifold-valued Multivariate General Linear Models (MMGLMs) with Matlab scripts for generating small jobs for HTConder
 ====
 
 NEWS!!!
