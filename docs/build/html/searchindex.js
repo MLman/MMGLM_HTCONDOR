@@ -1,1 +1,1 @@
-Search.setIndex({objects:{},terms:{index:0,search:0,welcom:0,modul:0,indic:0,mmglm:0,content:0,tabl:0,document:0,page:0},objtypes:{},titles:["Welcome to MMGLM&#8217;s documentation!"],objnames:{},filenames:["index"]})
+Search.setIndex({docnames:["index"],envversion:52,filenames:["index.rst"],objects:{},objnames:{},objtypes:{},terms:{content:0,index:0,modul:0,page:0,search:0},titles:["Welcome to MMGLM\u2019s documentation!"],titleterms:{document:0,indic:0,mmglm:0,tabl:0,welcom:0}})
