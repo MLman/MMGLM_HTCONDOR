@@ -1,0 +1,6 @@
+.. meta::
+   :keywords: Diffusion MRI, cauchy deformation tensor, software, tool, mmglm, manifold, spd, dti, odf, cdt
+
+.. |br| raw:: html
+
+<br />
